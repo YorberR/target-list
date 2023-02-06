@@ -8,7 +8,7 @@ import { CreateTodoButton } from './CreateTodoButton';
 
 const todos = [
   { text: 'Comer el almuerzo', completed: false },
-  { text: 'Tomar curso de react', completed: false },
+  { text: 'Tomar curso de react', completed: true },
   { text: 'Irme a casa', completed: false }
 ];
 
@@ -17,18 +17,20 @@ function App() {
     <React.Fragment>
       <TodoCounter />
       <TodoSearch />
-      <input placeholder="Cebolla"/>
 
       <TodoList>
 
         {todos.map(todo => (
-          <TodoItem key={todo.text} text={todo.text} />
+          <TodoItem 
+          key={todo.text}
+          text={todo.text}
+          completed={todo.completed}
+          />
         ))}
       </TodoList>
 
       <CreateTodoButton/>
 
-      <button>+</button>
     
     </React.Fragment>
   );
