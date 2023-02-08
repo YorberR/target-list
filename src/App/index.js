@@ -1,24 +1,76 @@
 import React from 'react';
 import { AppUI } from './appUI';
-// import './App.css';
 
-const defaultTodos = [
-  { text: 'Comer el almuerzo', completed: false },
-  { text: 'Tomar curso de react', completed: true },
-  { text: 'Irme a casa', completed: false }
-];
+function useLocalStorage(itemName, initialValue) {
+  // Creamos el estado inicial para nuestros errores y carga
+  const [error, setError] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [item, setItem] = React.useState(initialValue);
+  
+  React.useEffect(() => {
+  // Simulamos un segundo de delay de carga 
+    setTimeout(() => {
+      // Manejamos la tarea dentro de un try/catch por si ocurre algún error
+      try {
+        const localStorageItem = localStorage.getItem(itemName);
+        let parsedItem;
+        
+        if (!localStorageItem) {
+          localStorage.setItem(itemName, JSON.stringify(initialValue));
+          parsedItem = initialValue;
+        } else {
+          parsedItem = JSON.parse(localStorageItem);
+        }
+
+        setItem(parsedItem);
+      } catch(error) {
+      // En caso de un error lo guardamos en el estado
+        setError(error);
+      } finally {
+        // También podemos utilizar la última parte del try/cath (finally) para terminar la carga
+        setLoading(false);
+      }
+    }, 1000);
+  });
+  
+  const saveItem = (newItem) => {
+    // Manejamos la tarea dentro de un try/catch por si ocurre algún error
+    try {
+      const stringifiedItem = JSON.stringify(newItem);
+      localStorage.setItem(itemName, stringifiedItem);
+      setItem(newItem);
+    } catch(error) {
+      // En caso de algún error lo guardamos en el estado
+      setError(error);
+    }
+  };
+
+  // Para tener un mejor control de los datos retornados, podemos regresarlos dentro de un objeto
+  return {
+    item,
+    saveItem,
+    loading,
+    error,
+  };
+}
 
 function App() {
-  const [todos, setTodos] = React.useState(defaultTodos);
-  // El estado de nuestra búsqueda
+  
+  const {
+    item: todos,
+    saveItem: saveTodos,
+    loading,
+    error,
+  } = useLocalStorage('TODOS_V1', []);
+
   const [searchValue, setSearchValue] = React.useState('');
 
   const completedTodos = todos.filter(todo => !!todo.completed).length;
   const totalTodos = todos.length;
-  // Creamos una nueva variable en donde guardaremos las coincidencias con la búsqueda
+
   let searchedTodos = [];
 
-  // Lógica para filtrar
+
   if (!searchValue.length >= 1) {
     searchedTodos = todos;
   } else {
@@ -32,19 +84,21 @@ function App() {
   const toggleCompleteTodos = (text) => {
     const todoIndex = todos.findIndex(todo => todo.text === text);
     const newTodos = [...todos];
-    newTodos[todoIndex].completed = !newTodos[todoIndex].completed;
-    setTodos(newTodos);
+    newTodos[todoIndex].completed = true;
+    saveTodos(newTodos);
   }
 
   const deleteTodo = (text) => {
     const todoIndex = todos.findIndex(todo => todo.text === text);
     const newTodos =[...todos];
     newTodos.splice(todoIndex, 1);
-    setTodos(newTodos);
+    saveTodos(newTodos);
   };
 
   return (
-    <AppUI 
+    <AppUI
+      loading={loading}
+      error={error}
       totalTodos={totalTodos}
       completedTodos={completedTodos}
       searchValue={searchValue}
