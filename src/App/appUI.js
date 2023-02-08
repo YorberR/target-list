@@ -1,40 +1,35 @@
 import React from "react";
-import { TodoCounter } from '../components/TodoCounter';
-import { TodoSearch } from '../components/TodoSearch';
-import { TodoList } from '../components/TodoList';
-import { TodoItem } from '../components/TodoItem';
-import { CreateTodoButton } from '../components/CreateTodoButton';
+import { TodoContext } from "../components/todoContext";
+import { TodoCounter } from "../components/TodoCounter";
+import { TodoSearch } from "../components/TodoSearch";
+import { TodoList } from "../components/TodoList";
+import { TodoItem } from "../components/TodoItem";
+import { CreateTodoButton } from "../components/CreateTodoButton";
+import { Modal } from "../components/Modal/index"
 
-function AppUI({
-    loading,
-    error,
-    totalTodos,
-    completedTodos,
-    searchValue,
-    setSearchValue,
-    searchedTodos,
-    toggleCompleteTodos,
-    deleteTodo,
-}){
+function AppUI() {
+    const { 
+        error,
+        loading, 
+        searchedTodos, 
+        toggleCompleteTodos, 
+        deleteTodo,
+        openModal,
+        setOpenModal
+    } = React.useContext(TodoContext);
+
     return (
         <React.Fragment>
-        <TodoCounter 
-            total={totalTodos}
-            completed={completedTodos}
-        />
-        <TodoSearch 
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-        />
+        <TodoCounter />
+        <TodoSearch />
 
         <TodoList>
-
-            {error && <p>Desepérate, hubo un error...</p>}
+                {error && <p>Desepérate, hubo un error...</p>}
             {loading && <p>Estamos cargandon, no deseperes...</p>}
             {!loading && !searchedTodos.length && <p>¡Crea tu pimer TODO!</p>}
 
-            {searchedTodos.map(todo => (
-                <TodoItem 
+            {searchedTodos.map((todo) => (
+                <TodoItem
                     key={todo.text}
                     text={todo.text}
                     completed={todo.completed}
@@ -44,9 +39,16 @@ function AppUI({
             ))}
         </TodoList>
 
-        <CreateTodoButton/>
 
+        {openModal && (
+            <Modal>
+                <p>{searchedTodos[0]?.text}</p>
+            </Modal>
+        )}
 
+        <CreateTodoButton 
+            setOpenModal={setOpenModal}
+        />
         </React.Fragment>
     );
 }
