@@ -4,8 +4,9 @@ import { TodoCounter } from "../components/TodoCounter";
 import { TodoSearch } from "../components/TodoSearch";
 import { TodoList } from "../components/TodoList";
 import { TodoItem } from "../components/TodoItem";
+import { TodoForm } from "../components/TodoForm";
 import { CreateTodoButton } from "../components/CreateTodoButton";
-import { Modal } from "../components/Modal/index"
+import { Modal } from "../components/Modal"
 
 function AppUI() {
     const { 
@@ -15,7 +16,7 @@ function AppUI() {
         toggleCompleteTodos, 
         deleteTodo,
         openModal,
-        setOpenModal
+        setOpenModal,
     } = React.useContext(TodoContext);
 
     return (
@@ -24,14 +25,12 @@ function AppUI() {
         <TodoSearch />
 
         <TodoList>
-                {error && <p>Desepérate, hubo un error...</p>}
+            {error && <p>Desepérate, hubo un error...</p>}
             {loading && <p>Estamos cargandon, no deseperes...</p>}
             {!loading && !searchedTodos.length && <p>¡Crea tu pimer TODO!</p>}
 
             {searchedTodos.map((todo) => (
                 <TodoItem
-                    key={todo.text}
-                    text={todo.text}
                     completed={todo.completed}
                     onComplete={() => toggleCompleteTodos(todo.text)}
                     onDelete={() => deleteTodo(todo.text)}
@@ -42,7 +41,7 @@ function AppUI() {
 
         {openModal && (
             <Modal>
-                <p>{searchedTodos[0]?.text}</p>
+                <TodoForm />
             </Modal>
         )}
 
